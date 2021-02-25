@@ -1,0 +1,31 @@
+<modification>
+	<name>Filemanager filetypes support</name>
+	<code>rubika-filemanager-filetypes</code>
+	<version>1.0</version>
+	<author>Rubika</author>
+	<link>https://rubika.com.ua</link>
+
+	<file path="admin/controller/common/filemanager.php">
+		<operation error="skip">
+			<search><![CDATA[jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF]]></search>
+			<add position="replace"><![CDATA[' . implode( ',', array_map('trim', explode(PHP_EOL, $this->config->get('config_file_ext_allowed'))) ) . ']]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->model_tool_image->resize(utf8_substr($image, utf8_strlen(DIR_IMAGE)), 100, 100),]]></search>
+			<add position="replace"><![CDATA[(is_array(getimagesize($image))) ? $this->model_tool_image->resize(utf8_substr($image, utf8_strlen(DIR_IMAGE)), 100, 100) : $this->model_tool_image->resize('no_image.png', 100, 100),]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if (!in_array(utf8_strtolower(utf8_substr(strrchr($filename, '.'), 1)), $allowed)) {]]></search>
+			<add position="before"><![CDATA[
+				$allowed = array_merge($allowed, array_map('trim', explode(PHP_EOL, $this->config->get('config_file_ext_allowed'))));
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[if (!in_array($file['type'], $allowed)) {]]></search>
+			<add position="before"><![CDATA[
+				$allowed = array_merge($allowed, array_map('trim', explode(PHP_EOL, $this->config->get('config_file_mime_allowed'))));
+			]]></add>
+		</operation>
+	</file>
+
+</modification>
